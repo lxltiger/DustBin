@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config>
+        <device id="pixel_xl" />
+        <device id="pixel_3_xl" />
+        <device id="Nexus 6" />
+      </config>
+    </shared>
+  </component>
+  <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f1a594ae-ab35-48d2-9c1f-274658d3f6d0" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/annotation/OperationCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/entity/OperationRecord.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/app/BindingAdapters.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/app/BindingAdapters.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/app/HomeRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/app/HomeRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/AppSettingFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/AppSettingFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/BaseFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/BaseFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/CabinetManageFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/CabinetManageFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/ConfirmFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/ConfirmFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/HomeFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/fragment/HomeFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/listener/OnOpenListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/listener/OperationListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/nanj/zjh/bath/utils/Constant.ja

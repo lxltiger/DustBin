@@ -1,0 +1,114 @@
+apply plugin: 'com.android.application'
+
+//打包时间
+def static releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
+
+
+def keystoreFilepath = ''
+def keystorePSW = ''
+def keystoreAlias = ''
+def keystoreAliasPSW = ''
+def keyfile = file('s.keystore.temp')
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+keystoreFilepath = properties.getProperty("keystore.path")
+
+if (keystoreFilepath) {
+    keystorePSW = properties.getProperty("keystore.password")
+    keystoreAlias = properties.getProperty("keystore.alias")
+    keystoreAliasPSW = properties.getProperty("keystore.alias_password")
+    keyfile = file(keystoreFilepath)
+}
+
+android {
+    compileSdkVersion build_versions.target_sdk
+//    buildToolsVersion "29.0.1"
+    defaultConfig {
+        applicationId "com.lxl.jzh.dustbin"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode 1
+        versionName "1.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs'];
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    signingConfigs {
+        debug {
+            keyAlias keystoreAlias
+            keyPassword keystoreAliasPSW
+            storeFile file(keyfile)
+            storePassword keystorePSW
+        }
+    }
+
+    buildTypes {
+        debug {
+            if (keyfile.exists()) {
+                signingConfig signingConfigs.debug
+            }
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (keyfile.exists()) {
+                signingConfig signingConfigs.debug
+            }
+
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "DustBin_${defaultConfig.versionName}_${releaseTime()}.apk"
+                }
+            }
+        }
+    }
+
+    aaptOptions.cruncherEnabled = false
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.aar'], dir: 'libs')
+    implementation deps.support.app_compat
+    implementation deps.support.recyclerview
+    implementation deps.support.cardview
+    implementation deps.support.design
+    implementation deps.support.v4
+    implementation deps.constraint_layout
+    //    Room
+    implementation deps.room.runtime
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    annotationProcessor deps.room.compiler
+    //    LiveData、ViewModel
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.extensions
+    implementation deps.lifecycle.java8
+    annotationProcessor deps.lifecycle.compiler
+    //navtion
+    implementation deps.navigation.fragment
+    implementation deps.navigation.ui
+    implementation project(path: ':locker_library')
+    implementation project(path: ':usbSerialForAndroid')
+    implementation project(path: ':xlog_library')
+
+}

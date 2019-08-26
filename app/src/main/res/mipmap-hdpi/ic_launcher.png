@@ -1,0 +1,91 @@
+package com.nanj.zjh.bath.app;
+
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.databinding.BindingAdapter;
+
+import com.bumptech.glide.Glide;
+import com.example.x6.serial.LockerConstant;
+import com.nanj.zjh.bath.R;
+import com.nanj.zjh.bath.entity.Cabinet;
+
+import java.util.Locale;
+
+import static com.nanj.zjh.bath.fragment.CabinetManageFragment.DEVICE_CABINET;
+
+public class BindingAdapters {
+    private static final String TAG = "BindingAdapters";
+    public static final int NORMAL = 4 * 60 * 60 * 1000;
+    public static final int TIME_OUT = 8 * 60 * 60 * 1000;
+
+   /* @BindingAdapter("visibleGone")
+    public static void setVisible(View view, boolean show) {
+        view.setVisibility(show ? View.VISIBLE : View.GONE);
+    }*/
+
+
+    @BindingAdapter("openResult")
+    public static void setOpenResult(TextView view, int status) {
+        switch (status) {
+            case -1:
+                view.setText("开锁成功");
+                break;
+            case -2:
+                view.setText("开锁失败");
+                break;
+            case -3:
+                view.setText("查询失败");
+                break;
+            case 0:
+                view.setText("柜门已关闭");
+                break;
+            case 1:
+                view.setText("柜门已开");
+                break;
+        }
+    }
+
+
+    @BindingAdapter("cabinetInfo")
+    public static void setCabinetInfo(TextView view, Cabinet cabinet) {
+        if (cabinet == null) {
+            return;
+        }
+        int status = cabinet.status();
+        String statusInfo = LockerConstant.getStatusInfo(status);
+        /*// TODO: 2019/8/5 优化
+        switch (status) {
+            case CABINET_OPEN_SUCCEED:
+                statusInfo="开锁成功";
+                break;
+            case CABINET_OPEN_FAIL:
+                statusInfo="开锁失败";
+                break;
+            case CABINET_QUERY_FAIL:
+                statusInfo="查询失败";
+                break;
+            case CABINET_CLOSED:
+                statusInfo="柜门已关闭";
+                break;
+            case CABINET_OPENED:
+                statusInfo="柜门已开";
+                break;
+        }*/
+        String info = String.format(Locale.CHINA, "%s:%s 指静脉ID:%d", cabinet.id(), statusInfo, cabinet.getVeinId());
+        if (DEVICE_CABINET.equals(cabinet.getCabinetNo())) {
+            view.setText(String.format("设备柜:%s", LockerApp.get().deviceId()));
+        } else {
+            view.setText(info);
+        }
+    }
+
+    @BindingAdapter("status")
+    public static void setCabinetStatus(View view, Cabinet cabinet) {
+        long startTime = cabinet.getStartTime();
+        if

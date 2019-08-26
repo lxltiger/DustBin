@@ -1,0 +1,230 @@
+package com.nanj.zjh.locker.app;
+
+
+import android.os.Environment;
+
+import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+
+import com.nanj.zjh.locker.BuildConfig;
+import com.nanj.zjh.locker.api.ApiResponse;
+import com.nanj.zjh.locker.api.HttpService;
+import com.nanj.zjh.locker.api.NetWork;
+import com.nanj.zjh.locker.database.LockDataBase;
+import com.nanj.zjh.locker.entity.Cabinet;
+import com.nanj.zjh.locker.entity.ClearGridResult;
+import com.nanj.zjh.locker.entity.DeleteFaceResponse;
+import com.nanj.zjh.locker.entity.FaceDetectResult;
+import com.nanj.zjh.locker.entity.OperationRecord;
+import com.nanj.zjh.locker.entity.PayResult;
+import com.nanj.zjh.locker.entity.QrCodeInfoResult;
+import com.nanj.zjh.locker.utils.LockManager;
+import com.nanj.zjh.locker.utils.NetWorkUtil;
+import com.tencent.mars.xlog.Log;
+import com.tencent.mars.xlog.Xlog;
+
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+
+public class HomeRepository {
+    private static final String TAG = "HomeRepository";
+    private final LockerApp lockerApp;
+    private AppExecutors appExecutors;
+    private LockManager lockManager;
+    private final LockDataBase dataBase;
+    private HttpService httpService;
+    private AtomicBoolean started = new AtomicBoolean(false);
+
+    //记录每次存取操作相关内容
+    private OperationRecord operationRecord = OperationRecord.provide(Constant.ACTION_UNKNOWN);
+
+    public HomeRepository(AppExecutors appExecutors, LockDataBase dataBase) {
+        lockerApp = LockerApp.get();
+        this.appExecutors = appExecutors;
+        this.dataBase = dataBase;
+    }
+
+    public void fire(String cachePath, String prefix) {
+        if (started.compareAndSet(false, true)) {
+            setupLog(cachePath, prefix);
+            lockManager = new LockManager(this);
+            httpService = NetWork.httpService();
+            appExecutors.diskIO().execute(() -> {
+                int availableCabinetCount = dataBase.lockDao().getAvailableCabinetCount();
+            });
+        }
+    }
+
+    //因为日志和外部存储相关，所以其初始化的前提条件是有外部读写权限
+    private void setupLog(/*Context context,*/String cachePath, String prefix) {
+        final String logPath = Environment.getExternalStorageDirectory().getPath() + "/xlog";
+//        final String cachePath = context.getFilesDir() + "/xlog";
+        final String PUB_KEY = "";
+//        String prefix = context.getString(R.string.app_log_name);
+        //cacheDay设为0，不然会长时间缓存在内存中不会写到磁盘上
+        if (BuildConfig.DEBUG) {
+            Xlog.appenderOpen(Xlog.LEVEL_DEBUG, Xlog.AppednerModeAsync, cachePath, logPath, prefix, PUB_KEY);
+            Xlog.setConsoleLogOpen(true);
+
+        } else {
+            Xlog.appenderOpen(Xlog.LEVEL_INFO, Xlog.AppednerModeAsync, cachePath, logPath, prefix, PUB_KEY);
+            Xlog.setConsoleLogOpen(false);
+        }
+        Log.setLogImp(new Xlog());
+    }
+
+    public void exit() {
+        if (started.compareAndSet(true, false)) {
+            Log.appenderClose();
+            lockManager.exit();
+            lockManager = null;
+        }
+    }
+
+
+    public void checkDataBase() {
+        appExecutors.diskIO().execute(() -> {
+            int availableCabinetCount = dataBase.lockDao().getAvailableCabinetCount();
+            Log.d(TAG, "checkDataBase: " + availableCabinetCount);
+        });
+    }
+
+
+    /**
+     * 支付宝和微信的支付二维码和订单号
+     *
+     * @param
+     * @return
+     */
+    public LiveData<QrCodeInfoResult> getQrCodeInfo() {
+        Log.d(TAG, "getQrCodeInfo");
+        MediatorLiveData<QrCodeInfoResult> result = new MediatorLiveData<>();
+        LiveData<ApiResponse<QrCodeInfoResult>> response = httpService.getScanImageCode(lockerApp.deviceId());
+        result.addSource(response, apiResponse -> {
+            result.removeSource(response);
+            if (apiResponse.isSuccessful()) {
+                Log.d(TAG, "getCodeInfo: ");
+                QrCodeInfoResult qrCodeResult = apiResponse.body;
+                qrCodeResult.decode();
+                if (qrCodeResult.isDecodeAliSuccess()) {
+                    Log.d(TAG, "DecodeAliSuccess: ");
+                    operationRecord.setAliOrder(qrCodeResult.getAli_order());
+                }
+
+                if (qrCodeResult.isDecodeWxSuccess()) {
+                    Log.d(TAG, "DecodeWxSuccess: ");
+                    operationRecord.setWxOrder(qrCodeResult.getWx_order());
+                }
+                result.setValue(qrCodeResult);
+
+            } else {
+                result.setValue(null);
+            }
+        });
+        return result;
+    }
+
+
+    public LiveData<PayResult> getWeiXinPayResult() {
+        Log.d(TAG, "getWeiXinPayResult ");
+        ArrayMap<String, String> queryMap = operationRecord.getWxPayRequest();
+        MediatorLiveData<PayResult> result = new MediatorLiveData<>();
+        LiveData<ApiResponse<PayResult>> response = httpService.getWeiXinPayResult(queryMap);
+        result.addSource(response, apiResponse -> {
+            result.removeSource(response);
+            if (apiResponse.isSuccessful()) {
+                PayResult payResult = apiResponse.body;
+                if (payResult != null) {
+                    Log.d(TAG, payResult.toString());
+                    if ("SUCCESS".equals(payResult.getCode())) {
+                        payResult.setSucceed(true);
+                    } else if ("FAIL".equals(payResult.getCode())) {
+//                        todo 需要后台更改逻辑
+                        if ("当前柜子在使用中...".equals(payResult.getMsg())) {
+                            payResult.setSucceed(true);
+                        }
+                    }
+                    if (payResult.isSucceed()) {
+                        handlePaySucceed(Constant.WX, operationRecord.getWxOrder());
+                    }
+                    result.setValue(payResult);
+
+                } else {
+                    result.setValue(null);
+                }
+            } else {
+                result.setValue(null);
+            }
+        });
+        return result;
+    }
+
+    public LiveData<PayResult> getBaoPayResult() {
+        Log.d(TAG, "getBaoPayResult: ");
+        MediatorLiveData<PayResult> result = new MediatorLiveData<>();
+        ArrayMap<String, String> queryMap = operationRecord.getAliPayRequest();
+        LiveData<ApiResponse<PayResult>> response = httpService.getBaoPayResult(queryMap);
+        result.addSource(response, apiResponse -> {
+            result.removeSource(response);
+            if (apiResponse.isSuccessful()) {
+                PayResult payResult = apiResponse.body;
+                if (payResult != null) {
+                    Log.d(TAG, payResult.toString());
+                    if ("SUCCESS".equals(payResult.getCode())) {
+                        payResult.setSucceed(true);
+                    } else if ("FAIL".equals(payResult.getCode())) {
+                        if ("当前柜子在使用中...".equals(payResult.getMsg())) {
+                            payResult.setSucceed(true);
+                        }
+                    }
+                    if (payResult.isSucceed()) {
+                        handlePaySucceed(Constant.ALI, operationRecord.getAliOrder());
+                    }
+                    result.setValue(payResult);
+
+                } else {
+                    result.setValue(null);
+                }
+            } else {
+                result.setValue(null);
+            }
+        });
+        return result;
+    }
+
+    private void handlePaySucceed(int payStyle, String order) {
+        Log.d(TAG, "handlePaySucceed: ");
+        Cabinet availableCabinet = operationRecord.getCabinet();
+        if (availableCabinet != null) {
+            availableCabinet.setPayStyle(payStyle);
+            availableCabinet.setPaid(true);
+            availableCabinet.setOrder(order);
+            availableCabinet.setStatus(Constant.CABINET_CLOSED);
+            availableCabinet.setStartTime(System.currentTimeMillis());
+            updateDeviceStatus(availableCabinet, false);
+            //用来第二次上传图片的参数
+            operationRecord.setOrderNo(order);
+            operationRecord.setType("intoFace");
+        }
+    }
+
+    public void updateDeviceStatus(Cabinet cabinet, boolean open) {
+        appExecutors.diskIO().execute(() -> {
+            dataBase.lockDao().updateDeviceStatus(cabinet);
+            if (open) {
+                openCabinet(cabinet);
+            }
+        });
+
+    }
+
+    public LiveData<DeleteFaceResponse> deleteFace(/*FaceDetectResult.Result faceDet

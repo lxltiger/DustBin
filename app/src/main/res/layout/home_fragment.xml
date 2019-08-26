@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".home.HomeFragment">
+
+        <TextView
+            android:id="@+id/tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请选择垃圾种类"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/residual_waste"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.lxl.jzh.base.view.ScaleImageView
+            android:id="@+id/residual_waste"
+            android:layout_width="@dimen/home_icon_width"
+            android:layout_height="@dimen/home_icon_height"
+            android:background="@drawable/residual_waste"
+            android:onClick="@{listener::onClick}"
+            app:layout_constraintBottom_toTopOf="@id/recyclable_waste"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/hazardous_waste"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.lxl.jzh.base.view.ScaleImageView
+            android:id="@+id/hazardous_waste"
+            android:layout_width="@dimen/home_icon_width"
+            android:layout_height="@dimen/home_icon_height"
+            android:background="@drawable/hazardous_waste"
+            android:onClick="@{listener::onClick}"
+            app:layout_constraintLeft_toRightOf="@id/residual_waste"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/residual_waste" />
+
+        <com.lxl.jzh.base.view.ScaleImageView
+            android:id="@+id/recyclable_waste"
+            android:layout_width="@dimen/home_icon_width"
+            android:layout_height="@dimen/home_icon_height"
+            android:background="@drawable/recyclable_waste"
+            android:onClick="@{listener::onClick}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/household_waste"
+            app:layout_constraintTop_toBottomOf="@id/residual_waste" />
+
+        <com.lxl.jzh.base.view.ScaleImageView
+            android:id="@+id/household_waste"
+            android:layout_width="@dimen/home_icon_width"
+            android:layout_height="@dimen/home_icon_height"
+            android:background="@drawable/household_waste"
+            android:onClick="@{listener::onClick}"
+            app:layout_constraintLeft_toRightOf="@id/recyclable_waste"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/recyclable_waste" />
+
+        <com.lxl.jzh.base.view.ScaleImageView
+            android:id="@+id/setting"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

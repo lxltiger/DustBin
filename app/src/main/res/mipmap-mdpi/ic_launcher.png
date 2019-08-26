@@ -1,0 +1,47 @@
+package com.nanj.zjh.bath.app;
+
+import android.util.Log;
+
+import androidx.annotation.Nullable;
+import androidx.collection.ArrayMap;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+
+import com.example.x6.serial.GridListener;
+import com.example.x6.serial.LockerService;
+import com.lxl.jzh.base.Utils.NetWorkUtil;
+import com.lxl.jzh.locker.LockServiceProvider;
+import com.nanj.zjh.bath.annotation.OperationCode;
+import com.nanj.zjh.bath.api.ApiResponse;
+import com.nanj.zjh.bath.api.NetWork;
+import com.nanj.zjh.bath.api.PayService;
+import com.nanj.zjh.bath.database.LockDataBase;
+import com.nanj.zjh.bath.entity.Cabinet;
+import com.nanj.zjh.bath.entity.OperationRecord;
+import com.nanj.zjh.bath.entity.PayRequest;
+import com.nanj.zjh.bath.entity.PayResult;
+import com.nanj.zjh.bath.entity.QrCodeInfoResult;
+import com.nanj.zjh.bath.utils.Constant;
+import com.nanj.zjh.bath.utils.SpeechHelper;
+import com.nanj.zjh.bath.utils.UsbDeviceService;
+
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.example.x6.serial.LockerConstant.CABINET_CLOSED;
+import static com.example.x6.serial.LockerConstant.CABINET_OPENED;
+import static com.xgzx.veinmanager.VeinApi.MSG_COLLECT_FAIL;
+import static com.xgzx.veinmanager.VeinApi.MSG_CONNECT_FAIL;
+import static com.xgzx.veinmanager.VeinApi.MSG_ID_REPEAT;
+import static com.xgzx.veinmanager.VeinApi.MSG_INVALID_ID;
+import static com.xgzx.veinmanager.VeinApi.MSG_NO_DEVICE;
+import static com.xgzx.veinmanager.VeinApi.MSG_REGISTER_FAIL;
+import static com.xgzx.veinmanager.VeinApi.MSG_REGISTER_REPEAT;
+import static com.xgzx.veinmanager.VeinApi.MSG_REGISTER_TIMEOUT;
+import static com.xgzx.veinmanager.VeinApi.MSG_REQUEST_PERMISSION_FAIL;
+import static com.xgzx.veinmanager.VeinApi.MSG_VERTIFIY_FAIL;
+import static com.xgzx.veinmanager.VeinApi.XG_ERR_NO_SAME_FINGER;
+import static com.xgzx.veinmanager.VeinApi.XG_VOICE_BEEP1;
+import 

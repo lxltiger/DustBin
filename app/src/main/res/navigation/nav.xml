@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav"
+    app:startDestination="@id/homeFragment">
+
+    <action
+        android:id="@+id/action_home"
+        app:popUpTo="@id/homeFragment" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.lxl.jzh.dustbin.home.HomeFragment"
+        android:label="home_fragment"
+        tools:layout="@layout/home_fragment" >
+        <action
+            android:id="@+id/action_to_adminFragment"
+            app:destination="@id/adminFragment" />
+        <action
+            android:id="@+id/action_overFragment"
+            app:destination="@id/overFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+
+        <action
+            android:id="@+id/action_to_adsFragment"
+            app:destination="@id/adsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/adminFragment"
+        android:name="com.lxl.jzh.dustbin.admin.AdminFragment"
+        android:label="fragment_admin"
+        tools:layout="@layout/fragment_admin" >
+
+
+    </fragment>
+    <fragment
+        android:id="@+id/overFragment"
+        tools:layout="@layout/fragment_over"
+        android:name="com.lxl.jzh.dustbin.admin.OverFragment"
+        android:label="OverFragment" />
+
+    <fragment
+        android:id="@+id/adsFragment"
+        tools:layout="@layout/fragment_ads"
+        android:name="com.lxl.jzh.dustbin.admin.AdsFragment"
+        android:label="adsFragment" />
+</navigation>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">垃圾箱</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="please_throw">箱门已开!\n请在10秒内完成投放</string>
+    <string name="thank_throw">恭喜你完成一次垃圾分类!\n为环保做出贡献</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -1,0 +1,1 @@
+include ':app', ':locker_library', ':usbSerialForAndroid', ':xlog_library'

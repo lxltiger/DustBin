@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="manager"
+            type="boolean" />
+
+        <variable
+            name="showProgressBar"
+            type="boolean" />
+
+
+        <variable
+            name="listener"
+            type="android.view.View.OnClickListener" />
+
+
+        <variable
+            name="version"
+            type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg"
+
+        android:tag="base_admin">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/logo_golden_bay"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.lxl.jzh.base.view.ScaleImageView
+                android:id="@+id/iv_back"
+                android:layout_width="@dimen/title_icon_width"
+                android:layout_height="@dimen/title_icon_height"
+                android:layout_centerVertical="true"
+                android:layout_gravity="start"
+                android:background="@drawable/iv_back_base"
+                android:onClick="@{listener::onClick}" />
+
+            <com.lxl.jzh.base.view.ScaleImageView
+                android:id="@+id/iv_home"
+                android:layout_width="@dimen/title_icon_width"
+                android:layout_height="@dimen/title_icon_height"
+                android:layout_centerVertical="true"
+                android:layout_gravity="end"
+                android:background="@drawable/iv_home_base"
+                android:onClick="@{listener::onClick}" />
+        </androidx.appcompat.widget.Toolbar>
+
+        <EditText
+            android:id="@+id/et_psw"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:hint="请输入密码"
+            android:inputType="textPassword"
+            android:paddingLeft="16dp"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:visibleGone="@{!manager}" />
+
+        <Button
+            android:id="@+id/grid_manage"
+            android:layout_width="320dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_admin_button"
+            android:onClick="@{listener::onClick}"
+            android:text="格 口 管 理"
+            android:textColor="@color/blue"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:layout_constraintVertical_bias="0.1" />
+
+
+        <Button
+            android:id="@+id/app_setting"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_admin_button"
+            android:onClick="@{listener::onClick}"
+            android:text="应 用 设 置"
+            android:textColor="@color/blue"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintLeft_toLeftOf="@id/grid_manage"
+            app:layout_constraintRight_toRightOf="@id/grid_manage"
+            app:layout_constraintTop_toBottomOf="@id/grid_manage" />
+
+        <Button
+            android:id="@+id/exit"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_admin_button"
+            android:onClick="@{listener::onClick}"
+            android:text="退 出 应 用"
+            android:textColor="@color/blue"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="@id/grid_manage"
+            app:layout_constraintRight_toRightOf="@id/grid_manage"
+            app:layout_constraintTop_toBottomOf="@id/app_setting"
+            app:visibleGone="@{manager}" />
+
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            visibleGone="@{showProgressBar}"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:max="100"
+            android:progressDrawable="@drawable/pb_custom"
+            app:layout_constraintLeft_toLeftOf="@id/grid_manage"
+            app:layout_constraintRight_toLeftOf="@id/btn_cancle"
+            app:layout_constraintTop_toBottomOf="@id/exit" />
+
+        <Button
+            android:id="@+id/btn_cancle"
+            visibleGone="@{showProgressBar}"
+            android:layout_width="128dp"
+            android:layout_height="80dp"
+            android:onClick="@{listener::onClick}"
+            android:text="取消"
+            android:textSize="20sp"
+            app:layout_constraintRight_toRightOf="@id/exit"
+            app:layout_constraintTop_toTopOf="@id/progress" />
+
+        <!--need to be laid last -->
+        <Button
+            android:id="@+id/update"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_admin_button"
+            android:onClick="@{listener::onClick}"
+            android:text="升 级 应 用"
+            android:textColor="@color/blue"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="@id/grid_manage"
+            app:layout_constraintRight_toRightOf="@id/grid_manage"
+            app:layout_constraintTop_toBottomOf="@id/exit"
+            app:visibleGone="@{manager&amp;&amp;!showProgressBar}" />
+
+
+        <TextView
+            android:id="@+id/tv_version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="12dp"
+            android:text="@{version}"
+            android:textColor="@color/blue"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="Test" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>
